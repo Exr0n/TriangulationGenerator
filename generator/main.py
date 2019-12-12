@@ -5,12 +5,16 @@ FLOAT_TOLERANCE = 0.001
 import random, math, turtle, json
 
 class Point:
-  def __init__(self, x, y, id=0):
-    self.x = x;
-    self.y = y;
-    self.id = id;
-    if (self.id <= 0): # assign random id by default
-      self.id = random.randint(1, 10*BOUNDARY)
+  def __init__(self, x, y, id=None):
+    self.x = x
+    if self.x is None:
+      self.x = random.randint(-BOUNDARY, BOUNDARY)
+    self.y = y
+    if self.y is None:
+      self.y = random.randint(-BOUNDARY, BOUNDARY)
+    self.id = id
+    if self.id is None:
+      self.id = random.randint(-BOUNDARY, BOUNDARY)
     random.seed(self.id)
     self.color = (random.random(), random.random(), random.random()) # RGB value based on id
 
@@ -21,7 +25,7 @@ class Point:
     t.dot(5)
   
   def __repr__(self):
-    return (self.x, self.y, self.id)
+    return json.dumps([self.x, self.y, self.id])
 
   def __str__(self):
     return self.__class__.__name__ + "[%d] @(%d, %d)" % (self.id, self.x, self.y)
@@ -56,13 +60,16 @@ def floatEquals(float1, float2):
   return abs(float1-float2) < FLOAT_TOLERANCE
 
 def colinear(point1, point2, point3):
+  # protect against divide by zero errors
+  if (point1.x-point2.x == 0): return not floatEquals(point1.y, point2.y)
+  if (point2.x-point3.x == 0): return not floatEquals(point2.y, point3.y)
   return floatEquals(
     abs((point1.y-point2.y)/(point1.x-point2.x)),
     abs((point2.y-point3.y)/(point2.x-point3.x))
   )
 
-def generateStations(amount=5):
-  random.seed(SEED)
+def generateStations(amount=5, seed=None):
+  random.seed(seed or SEED)
   ret = []
   for i in range(amount):
     ret.append(Station(
@@ -71,8 +78,29 @@ def generateStations(amount=5):
     ))
   return ret;
 
-def generateShips(stations, amount=5):
-  random.seed(SEED)
+def generateStationsFromShips(ships, amount=5, seed=SEED):
+  random.seed(seed)
+  if (amount < 3):
+    raise Exception("Amount too small!")
+  ret = []
+  for i in range(amount):
+    print(random.randint(-BOUNDARY, BOUNDARY))
+    ret.append(Station())
+  print(ret)
+  while (colinear(ret[0], ret[1], ret[2])): # ensure atleast three stations are not colinear
+    ret[2] = Station(random.randint(-BOUNDARY, BOUNDARY), random.randint(-BOUNDARY, BOUNDARY)) # NTFS: TODO: there's gotta be a better way to do this than repeating the two random.randints over and over
+
+  for ship in ships:
+    s1, s2 = random.sample(ret, 2)
+    while (colinear(ship, s1, s2)):
+      s1, s2 = random.sample(ret, 2)
+    s1.locate(ship)
+    s2.locate(ship)
+  
+  return ret
+
+def generateShipsFromStations(stations, amount=5, seed=SEED):
+  random.seed(seed)
   ret = []
   for i in range(amount):
     s1, s2 = random.sample(stations, 2)
@@ -134,11 +162,22 @@ def output(seed, stations, ships):
     wf.write(json.dumps({"stations": _stations, "ships": _ships}, indent=2))
   print(f'Sucessfully wrote data to `{name}`!')
 
+# if __name__ == "__main__":
+#   ships = [Ship(0, 0)]
+#   print(ships)
+#   stations = generateStationsFromShips(ships)
+  
+#   output(SEED, stations, ships)
+#   printMap(stations, ships)
+#   t = input('Press ENTER to exit.\n')
+#   exit(0)
+
 if __name__ == "__main__":
   random.seed(SEED)
   stations = generateStations(10)
-  ships = generateShips(stations, 100)
+  ships = generateShipsFromStations(stations, 100)
 
   output(SEED, stations, ships)
-  printMap(stations, ships)
+  printMap(stations, ships, True)
   t = input('Press ENTER to exit.\n')
+  exit(0)

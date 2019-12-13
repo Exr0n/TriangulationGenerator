@@ -72,7 +72,7 @@ def generateStations(amount=5, seed=SEED):
   return ret;
 
 
-def generateShipsFromStations(stations, amount=5, seed=SEED):
+def generateShipsFromStations(stations, amount=5, seed=SEED, fill=False):
   random.seed(seed)
   ret = []
   for i in range(amount):
@@ -92,6 +92,9 @@ def generateShipsFromStations(stations, amount=5, seed=SEED):
     # Add this ship to the "radar" of its corresponding stations.
     s1.locate(ship)
     s2.locate(ship)
+    if (fill):
+      for st in stations:
+        st.locate(ship)
   return ret
 
 def printMap(stations, ships, fast=False):

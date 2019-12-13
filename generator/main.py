@@ -129,17 +129,16 @@ def output(seed, stations, ships):
   #     print(f'  Ship #{sp} at heading {s.radar[sp][1]}')
   
   name = f'{seed}_{len(stations)}x{len(ships)}.json'
-  _stations = [x.__repr__() for x in stations]
-  _ships = [s.__repr__() for s in ships]
+  _stations = {str(x.id): {"pos": [x.x, x.y], "radar": {s: x.radar[s][1] for s in x.radar}} for x in stations}
   with open(name, 'w+') as wf:
-    wf.write(json.dumps({"stations": _stations, "ships": _ships}, indent=2))
+    wf.write(json.dumps(_stations, indent=2))
   print(f'Sucessfully wrote data to `{name}`!')
 
 if __name__ == "__main__":
   random.seed(SEED)
-  stations = generateStations(10)
-  ships = generateShipsFromStations(stations, 100)
+  stations = generateStations(3)
+  ships = generateShipsFromStations(stations, 10)
 
   output(SEED, stations, ships)
-  printMap(stations, ships, True)
+  printMap(stations, ships, False);
   t = input('Press ENTER to exit.\n')

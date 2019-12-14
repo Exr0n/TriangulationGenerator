@@ -139,8 +139,8 @@ def output(seed, stations, ships):
 
 if __name__ == "__main__":
   random.seed(SEED)
-  stations = generateStations(3)
-  ships = generateShipsFromStations(stations, 10)
+  stations = generateStations(2)
+  ships = generateShipsFromStations(stations, 1)
 
   output(SEED, stations, ships)
   printMap(stations, ships, False);

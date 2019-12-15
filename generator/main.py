@@ -1,5 +1,5 @@
 BOUNDARY = 300
-SEED = 1337
+SEED = 130
 FLOAT_TOLERANCE = 0.001
 
 import random, math, turtle, json
@@ -89,6 +89,7 @@ def generateShipsFromStations(stations, amount=5, seed=SEED, fill=False):
       )
     # This ship fits the station pair!
     ret.append(ship)
+    print(f'Created ship at ({ship.x}, {ship.y})');
     # Add this ship to the "radar" of its corresponding stations.
     s1.locate(ship)
     s2.locate(ship)

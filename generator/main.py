@@ -1,8 +1,9 @@
-BOUNDARY = 300
-SEED = 130
+BOUNDARY = 600
+SEED = 230
 FLOAT_TOLERANCE = 0.001
 
 import random, math, turtle, json
+network = {}; # stores the network of ships
 
 class Point:
   def __init__(self, x, y, id=0):
@@ -89,6 +90,9 @@ def generateShipsFromStations(stations, amount=5, seed=SEED, fill=False):
       )
     # This ship fits the station pair!
     ret.append(ship)
+    network[ship.id] = [];
+    for sh in random.sample(ret, min(10, len(ret))):
+      network[ship.id].append(sh.id)
     print(f'Created ship at ({ship.x}, {ship.y})');
     # Add this ship to the "radar" of its corresponding stations.
     s1.locate(ship)
@@ -100,6 +104,7 @@ def generateShipsFromStations(stations, amount=5, seed=SEED, fill=False):
 
 def printMap(stations, ships, fast=False):
   t = turtle.Turtle()
+  turtle.screensize(2.2*BOUNDARY, 2.2*BOUNDARY);
   turtle.bgcolor(0, 0, 0)
   if (fast):
     turtle.tracer(0, 0)
@@ -123,6 +128,7 @@ def printMap(stations, ships, fast=False):
   for station in stations:
     station.draw(t)
   if fast: turtle.update()
+  turtle.getscreen().getcanvas().postscript(file=f'{SEED}_{len(stations)}x{len(ships)}.eps')
   return t
 
 def output(seed, stations, ships):
@@ -135,14 +141,14 @@ def output(seed, stations, ships):
   name = f'{seed}_{len(stations)}x{len(ships)}.json'
   _stations = {str(x.id): {"pos": [x.x, x.y], "radar": {s: x.radar[s][1] for s in x.radar}} for x in stations}
   with open(name, 'w+') as wf:
-    wf.write(json.dumps(_stations, indent=2))
+    wf.write(json.dumps({"communication_stations": _stations, "ship_connections": network}, indent=2))
   print(f'Sucessfully wrote data to `{name}`!')
 
 if __name__ == "__main__":
   random.seed(SEED)
-  stations = generateStations(2)
-  ships = generateShipsFromStations(stations, 1)
+  stations = generateStations(6)
+  ships = generateShipsFromStations(stations, 100, fill=True)
 
   output(SEED, stations, ships)
-  printMap(stations, ships, False);
+  printMap(stations, ships, True);
   t = input('Press ENTER to exit.\n')

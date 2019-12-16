@@ -58,9 +58,10 @@ for google_merch in sideways_david:
     david_mobile_fuel_capacity = mdavid.fabs(mdavid.sin(secret_lair_dist)*mdavid.sqrt(
             (davids_hideout_1.y-davids_hideout_2.y)**2
             + (davids_hideout_1.x-davids_hideout_2.x)**2
-        )/mdavid.sin(2*mdavid.pi-mdavid.fabs(secret_lair_dist)-mdavid.fabs(secret_lair_direction)))
+        )/mdavid.sin(2*mdavid.pi-mdavid.fabs(secret_lair_dist)+mdavid.fabs(secret_lair_direction)))
     print(david_mobile_fuel_capacity)
-    davids_secret_lair = (david_mobile_fuel_capacity*mdavid.cos(secret_lair_direction)+davids_hideout_1.x, david_mobile_fuel_capacity*mdavid.sin(secret_lair_direction)+davids_hideout_2.y)
+    davids_secret_lair = (david_mobile_fuel_capacity*mdavid.cos(davids_problem[davids_hideout_1.id]['radar'][google_merch])+davids_hideout_1.x,
+                          david_mobile_fuel_capacity*mdavid.sin(davids_problem[davids_hideout_2.id]['radar'][google_merch])+davids_hideout_2.y)
 
     print("found it!", davids_secret_lair)
     # print(found_it)
